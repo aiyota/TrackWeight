@@ -1,3 +1,5 @@
+using TrackWeight.Api.Endpointsl;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -12,5 +14,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.ConfigureUserRoutes();
 
 app.Run();
