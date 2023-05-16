@@ -1,9 +1,9 @@
 ﻿namespace TrackWeight.Api.Models;
 
-public class Weight
+public class WeightRecord
 {
     public int Id { get; set; }
-    public string UserId { get; set; } = default!;
-    public double Amount { get; set; }
+    public Guid UserId { get; set; } = default!;
+    public double Weight { get; set; }
     public DateTime CreatedAt { get; set; }
 }
