@@ -20,5 +20,6 @@ public interface IUserService
         Guid userId,
         string? userName,
         string? firstName,
-        string? lastName);
+        string? lastName,
+        string? password);
 }
