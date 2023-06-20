@@ -9,26 +9,30 @@ public static class UserEndpoints
 {
     public static void ConfigureUserRoutes(this WebApplication app)
     {
-        app.MapPost("/user/register", Register);
-        app.MapPost("/user/login", Login);
-        app.MapPatch("/user/update", Update);
+        app.MapPost("/userRecord/register", Register);
+        app.MapPost("/userRecord/login", Login);
+        app.MapPatch("/userRecord/update", Update);
     }
 
     private static async Task<IResult> Register(
         [FromBody] UserRegisterRequest request,
+        [FromServices] IAuthService authService,
         [FromServices] IUserService userService)
     {
-        var user = await userService.RegisterAsync(request.FirstName,
+        var userRecord = await userService.RegisterAsync(request.FirstName,
             request.LastName,
             request.Email,
             request.Password);
 
-        return Results.Ok(user.DomainToResponse());
+        var user = userRecord.DomainToResponse();
+        var token = authService.GenerateUserToken(userRecord);
+        return Results.Ok(new { user, token });
     }
 
 
     private static async Task<IResult> Login(
         [FromBody] UserLoginRequest request,
+        [FromServices] IAuthService authService,
         [FromServices] IUserService userService)
     {
         var loginSuccess = await userService.LoginAsync(request.Email, request.Password);
@@ -37,7 +41,16 @@ public static class UserEndpoints
             return Results.Unauthorized();
         }
 
-        return Results.Ok();
+        var userRecord = await userService.GetByEmailAsync(request.Email);
+        if (userRecord is null)
+        {
+            return Results.NotFound();
+        }
+        
+        var user = userRecord.DomainToResponse();
+        var token = authService.GenerateUserToken(userRecord);
+
+        return Results.Ok(new { user, token });
     }
 
     private static async Task<IResult> Update(
