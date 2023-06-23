@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TrackWeight.Api.Contracts;
 using TrackWeight.Api.Mapping;
 using TrackWeight.Api.Services;
 
 namespace TrackWeight.Api.Endpointsl;
+
+
 
 public static class UserEndpoints
 {
@@ -14,6 +17,7 @@ public static class UserEndpoints
         app.MapPatch("/userRecord/update", Update);
     }
 
+    [AllowAnonymous]
     private static async Task<IResult> Register(
         [FromBody] UserRegisterRequest request,
         [FromServices] IAuthService authService,
@@ -29,7 +33,7 @@ public static class UserEndpoints
         return Results.Ok(new { user, token });
     }
 
-
+    [AllowAnonymous]
     private static async Task<IResult> Login(
         [FromBody] UserLoginRequest request,
         [FromServices] IAuthService authService,

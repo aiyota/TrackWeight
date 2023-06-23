@@ -6,7 +6,7 @@ namespace TrackWeight.Api.Mapping;
 public static class UserMappings
 {
     public static UserResponse DomainToResponse(this User user) =>
-        new UserResponse(
+        new(
             user.Id,
             user.FirstName,
             user.LastName,
