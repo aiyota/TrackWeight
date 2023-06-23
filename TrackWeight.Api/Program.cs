@@ -1,15 +1,19 @@
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TrackWeight.Api.Common;
 using TrackWeight.Api.Endpointsl;
 using TrackWeight.Api.Infrastructure.Auth;
+using TrackWeight.Api.Middleware;
 using TrackWeight.Api.Persistence;
 using TrackWeight.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<ProblemDetailsFactory, TrackWeightProblemDetailsFactory>();
 
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection(JwtSettings.SectionName));
@@ -86,6 +90,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

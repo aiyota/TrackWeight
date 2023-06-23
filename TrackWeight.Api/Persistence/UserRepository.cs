@@ -30,17 +30,18 @@ public class UserRepository : IUserRepository
 
         await _dbContext.SaveChangesAsync();
 
-        return await GetByEmailAsync(email);
+        return await GetByEmailAsync(email) 
+                ?? throw new InvalidOperationException("User not found");
     }
 
-    public async Task<User> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _dbContext.Users.FirstAsync(u => u.Email == email);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<User> GetByIdAsync(Guid id)
+    public async Task<User?> GetByIdAsync(Guid id)
     {
-        return await _dbContext.Users.FirstAsync(u => u.Id == id);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<User> UpdateAsync(
@@ -50,13 +51,9 @@ public class UserRepository : IUserRepository
         string? email,
         string? passwordHash)
     {
-        var user = await _dbContext.Users.FindAsync(userId); 
-
-        if (user is null)
-        {
-            throw new Exception("User not found");
-        }
-
+        var user = await _dbContext.Users.FindAsync(userId) 
+                    ?? throw new InvalidOperationException("User not found");
+                    
         if (firstName is not null)
             user.FirstName = firstName;
 

@@ -1,4 +1,5 @@
-﻿using TrackWeight.Api.Models;
+﻿using TrackWeight.Api.Common.Errors;
+using TrackWeight.Api.Models;
 using TrackWeight.Api.Persistence;
 using BC = BCrypt.Net.BCrypt;
 
@@ -13,37 +14,24 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<User> GetByIdAsync(Guid id)
+    public async Task<User?> GetByIdAsync(Guid id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
-        if (user is null)
-        {
-            throw new Exception("User is not found");
-        }
-
+        var user = await _userRepository.GetByIdAsync(id) 
+                    ?? throw new UserNotFoundException(null, id);
         return user;
     }
 
-    public Task<User> GetByEmailAsync(string email)
+    public Task<User?> GetByEmailAsync(string email)
     {
-        var user = _userRepository.GetByEmailAsync(email);
-        if (user is null)
-        {
-            throw new Exception("User is not found");
-        }
-
+        var user = _userRepository.GetByEmailAsync(email) 
+                    ?? throw new UserNotFoundException(email, null);
         return user;
     }
 
     public async Task<bool> LoginAsync(string email, string password)
     {
-        var user = await _userRepository.GetByEmailAsync(email);
-
-        if (user is null)
-        {
-            throw new Exception("User is not found");
-        }
-
+        var user = await _userRepository.GetByEmailAsync(email) 
+                    ?? throw new UserNotFoundException(email, null);
         return VerifyPassword(password, user.PasswordHash);
     }
 
@@ -53,6 +41,11 @@ public class UserService : IUserService
         string email,
         string password)
     {
+        if (await _userRepository.GetByEmailAsync(email) is not null)
+        {
+            throw new DuplicateEmailException();
+        }
+
         return await _userRepository.CreateUserAsync(
             firstName,
             lastName,
@@ -67,6 +60,11 @@ public class UserService : IUserService
         string? lastName,
         string? password)
     {
+        if (await _userRepository.GetByIdAsync(userId) is null)
+        {
+            throw new UserNotFoundException(null, userId);
+        }
+
         var passwordHash = string.IsNullOrEmpty(password) 
                             ? null 
                             : HashPassword(password);

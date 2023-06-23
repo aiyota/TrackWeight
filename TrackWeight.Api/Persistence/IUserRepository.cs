@@ -4,9 +4,9 @@ namespace TrackWeight.Api.Persistence;
 
 public interface IUserRepository
 {
-    Task<User> GetByIdAsync(Guid id);
+    Task<User?> GetByIdAsync(Guid id);
 
-    Task<User> GetByEmailAsync(string email);
+    Task<User?> GetByEmailAsync(string email);
 
     Task<User> CreateUserAsync(
         string firstName,
