@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TrackWeight.Api.Common;
 using TrackWeight.Api.Contracts;
 using TrackWeight.Api.Infrastructure.Auth;
@@ -62,6 +63,7 @@ public static class UserEndpoints
 
         var user = userRecord.DomainToResponse();
         var token = authService.GenerateUserToken(userRecord);
+        
         SetTokenAsCookie(context, token, jwtSettings.ExpiryMinutes);
 
         return Results.Ok(new { user, token });
@@ -76,11 +78,15 @@ public static class UserEndpoints
 
     private static async Task<IResult> Update(
         [FromBody] UserUpdateRequest request,
-        [FromServices] IUserService userService)
+        [FromServices] IUserService userService,
+        HttpContext context)
     {
-        // TODO: implement getting user by id from token
+        var userId = GetUserIdFromContext(context);
+        if (userId is null)
+            return Results.Unauthorized();
+        
         var user = await userService.UpdateUserAsync(
-            request.Id,
+            Guid.Parse(userId),
             request.Email,
             request.FirstName,
             request.LastName,
@@ -118,4 +124,8 @@ public static class UserEndpoints
                 Secure = true
             });
     }
+
+    private static string? GetUserIdFromContext(HttpContext context) =>
+        context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
 }
