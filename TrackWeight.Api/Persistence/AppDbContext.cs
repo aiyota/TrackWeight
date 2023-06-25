@@ -29,5 +29,15 @@ public class AppDbContext : DbContext
              .WithMany()
              .HasForeignKey(u => u.UserId)
              .IsRequired();
+
+        modelBuilder.Entity<CalorieRecord>().HasKey(u => u.Id);
+        modelBuilder.Entity<CalorieRecord>().Property(u => u.UserId).IsRequired();
+        modelBuilder.Entity<CalorieRecord>().Property(u => u.Calories).IsRequired();
+        modelBuilder.Entity<CalorieRecord>().Property(u => u.CreatedAt).IsRequired();
+        modelBuilder.Entity<CalorieRecord>()
+             .HasOne<User>()
+             .WithMany()
+             .HasForeignKey(u => u.UserId)
+             .IsRequired();
     }
 }
