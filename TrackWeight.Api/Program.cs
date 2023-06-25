@@ -55,7 +55,7 @@ builder.Services.AddSwaggerGen(options =>
 
 JwtSettings jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() 
                           ?? throw new NullReferenceException("JwtSettings is null");
-
+builder.Services.AddSingleton(jwtSettings);
 builder.Services
     .AddAuthorization(options =>
     {

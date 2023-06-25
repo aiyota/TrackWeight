@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TrackWeight.Api.Common;
 using TrackWeight.Api.Contracts;
+using TrackWeight.Api.Infrastructure.Auth;
 using TrackWeight.Api.Mapping;
 using TrackWeight.Api.Services;
 
@@ -14,6 +16,7 @@ public static class UserEndpoints
     {
         app.MapPost("/userRecord/register", Register);
         app.MapPost("/userRecord/login", Login);
+        app.MapPost("/userRecord/logout", Logout);
         app.MapPatch("/userRecord/update", Update);
     }
 
@@ -21,7 +24,9 @@ public static class UserEndpoints
     private static async Task<IResult> Register(
         [FromBody] UserRegisterRequest request,
         [FromServices] IAuthService authService,
-        [FromServices] IUserService userService)
+        [FromServices] IUserService userService,
+        [FromServices] JwtSettings jwtSettings,
+        HttpContext context)
     {
         var userRecord = await userService.RegisterAsync(request.FirstName,
             request.LastName,
@@ -30,6 +35,8 @@ public static class UserEndpoints
 
         var user = userRecord.DomainToResponse();
         var token = authService.GenerateUserToken(userRecord);
+        SetTokenAsCookie(context, token, jwtSettings.ExpiryMinutes);
+
         return Results.Ok(new { user, token });
     }
 
@@ -37,7 +44,9 @@ public static class UserEndpoints
     private static async Task<IResult> Login(
         [FromBody] UserLoginRequest request,
         [FromServices] IAuthService authService,
-        [FromServices] IUserService userService)
+        [FromServices] IUserService userService,
+        [FromServices] JwtSettings jwtSettings,
+        HttpContext context)
     {
         var loginSuccess = await userService.LoginAsync(request.Email, request.Password);
         if (!loginSuccess)
@@ -50,11 +59,19 @@ public static class UserEndpoints
         {
             return Results.NotFound();
         }
-        
+
         var user = userRecord.DomainToResponse();
         var token = authService.GenerateUserToken(userRecord);
+        SetTokenAsCookie(context, token, jwtSettings.ExpiryMinutes);
 
         return Results.Ok(new { user, token });
+    }
+
+    [AllowAnonymous]
+    private static IResult Logout(HttpContext context)
+    {
+        RemoveTokenFromCookies(context);
+        return Results.Ok();
     }
 
     private static async Task<IResult> Update(
@@ -64,10 +81,41 @@ public static class UserEndpoints
         // TODO: implement getting user by id from token
         var user = await userService.UpdateUserAsync(
             request.Id,
-            request.UserName,
+            request.Email,
             request.FirstName,
             request.LastName,
             request.Password);
         return Results.Ok(user.DomainToResponse());
+    }
+
+    private static void SetTokenAsCookie(
+        HttpContext context,
+        string token,
+        int expiresInMinutes)
+    {
+        context.Response.Cookies.Append(
+            CustomHeaders.AccessToken, 
+            token,
+            new CookieOptions()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.Now.AddMinutes(expiresInMinutes),
+                Secure = true
+            });
+    }
+
+    private static void RemoveTokenFromCookies(HttpContext context)
+    {
+        context.Response.Cookies.Append(
+            CustomHeaders.AccessToken, 
+            string.Empty, 
+            new CookieOptions()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.Now.AddDays(-1),
+                Secure = true
+            });
     }
 }

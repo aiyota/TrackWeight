@@ -55,7 +55,7 @@ public class UserService : IUserService
 
     public async Task<User> UpdateUserAsync(
         Guid userId,
-        string? userName,
+        string? email,
         string? firstName,
         string? lastName,
         string? password)
@@ -70,9 +70,9 @@ public class UserService : IUserService
                             : HashPassword(password);
         return await _userRepository.UpdateAsync(
             userId,
-            userName,
             firstName,
             lastName,
+            email,
             passwordHash);
     }
 

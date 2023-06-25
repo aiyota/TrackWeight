@@ -20,7 +20,7 @@ public interface IUserService
 
     Task<User> UpdateUserAsync(
         Guid userId,
-        string? userName,
+        string? email,
         string? firstName,
         string? lastName,
         string? password);

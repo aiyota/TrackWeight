@@ -22,7 +22,7 @@ public class AuthEventsHandler : JwtBearerEvents
 
     private Task MessageReceivedHandler(MessageReceivedContext context)
     {
-        if (context.Request.Cookies.TryGetValue("X-Access-Token", out string? headerValue))
+        if (context.Request.Cookies.TryGetValue(CustomHeaders.AccessToken, out string? headerValue))
         {
             string? token = headerValue;
             if (!string.IsNullOrEmpty(token) && token.StartsWith(_bearerPrefix))
