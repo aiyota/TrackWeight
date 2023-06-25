@@ -19,5 +19,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>().Property(u => u.Email).IsRequired();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique(); 
         modelBuilder.Entity<User>().Property(u => u.PasswordHash).IsRequired();
+
+        modelBuilder.Entity<WeightRecord>().HasKey(u => u.Id);
+        modelBuilder.Entity<WeightRecord>().Property(u => u.UserId).IsRequired();
+        modelBuilder.Entity<WeightRecord>().Property(u => u.Weight).IsRequired();
+        modelBuilder.Entity<WeightRecord>().Property(u => u.CreatedAt).IsRequired();
+        modelBuilder.Entity<WeightRecord>()
+             .HasOne<User>()
+             .WithMany()
+             .HasForeignKey(u => u.UserId)
+             .IsRequired();
     }
 }
