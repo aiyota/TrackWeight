@@ -24,4 +24,6 @@ public interface IUserService
         string? firstName,
         string? lastName,
         string? password);
+
+    Guid GetUserIdFromContext(HttpContext context);
 }

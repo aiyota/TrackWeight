@@ -127,5 +127,4 @@ public static class UserEndpoints
 
     private static string? GetUserIdFromContext(HttpContext context) =>
         context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
 }

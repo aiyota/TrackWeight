@@ -10,6 +10,8 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = default!;
+    public DbSet<WeightRecord> WeightRecords { get; set; } = default!;
+    public DbSet<CalorieRecord> CalorieRecords { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,4 +1,5 @@
-﻿using TrackWeight.Api.Common.Errors;
+﻿using System.Security.Claims;
+using TrackWeight.Api.Common.Errors;
 using TrackWeight.Api.Models;
 using TrackWeight.Api.Persistence;
 using BC = BCrypt.Net.BCrypt;
@@ -86,5 +87,14 @@ public class UserService : IUserService
     public static bool VerifyPassword(string password, string hashedPassword)
     {
         return BC.Verify(password, hashedPassword);
+    }
+
+    public Guid GetUserIdFromContext(HttpContext context)
+    {
+        var stringId = context.User.Claims
+                        .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        return (stringId is not null) 
+                ? Guid.Parse(stringId) 
+                : Guid.Empty;
     }
 }

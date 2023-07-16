@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TrackWeight.Api.Common;
+using TrackWeight.Api.Endpoints;
 using TrackWeight.Api.Endpointsl;
 using TrackWeight.Api.Infrastructure.Auth;
 using TrackWeight.Api.Middleware;
@@ -24,6 +25,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWeightRepository, WeightRepository>();
+builder.Services.AddScoped<IWeightService, WeightService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -96,6 +100,7 @@ app.UseHttpsRedirection();
 
 
 app.ConfigureUserRoutes();
+app.ConfigureWeightRoutes();
 
 app.UseAuthorization();
 app.UseAuthentication();
