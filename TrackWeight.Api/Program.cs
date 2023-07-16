@@ -27,6 +27,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IWeightRepository, WeightRepository>();
 builder.Services.AddScoped<IWeightService, WeightService>();
+builder.Services.AddScoped<ICalorieRepository, CalorieRepository>();
+builder.Services.AddScoped<ICalorieService, CalorieService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -101,6 +103,7 @@ app.UseHttpsRedirection();
 
 app.ConfigureUserRoutes();
 app.ConfigureWeightRoutes();
+app.ConfigureCaloriesRoutes();
 
 app.UseAuthorization();
 app.UseAuthentication();

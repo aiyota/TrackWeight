@@ -37,6 +37,11 @@ public class WeightRepository : IWeightRepository
                         .ToListAsync();
     }
 
+    public async Task<WeightRecord?> GetRecordAsync(int weightId)
+    {
+        return await _dbContext.WeightRecords.FindAsync(weightId);
+    }
+
     public async Task<WeightRecord> UpdateAsync(
         int weightId,
         double? weight,
@@ -65,11 +70,5 @@ public class WeightRepository : IWeightRepository
         await _dbContext.SaveChangesAsync();
 
         return record;
-    }
-
-    public async Task<WeightRecord> GetRecordAsync(int weightId)
-    {
-        return await _dbContext.WeightRecords.FindAsync(weightId)
-               ?? throw new InvalidOperationException($"Record with ID {weightId} not found.");
     }
 }

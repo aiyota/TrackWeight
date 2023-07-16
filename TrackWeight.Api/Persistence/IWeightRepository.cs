@@ -9,7 +9,7 @@ public interface IWeightRepository
         double weight,
         DateTime createdAt);
 
-    Task<WeightRecord> GetRecordAsync(int weightId);
+    Task<WeightRecord?> GetRecordAsync(int weightId);
 
     Task<IEnumerable<WeightRecord>> GetRecordsAsync(Guid userId);
 

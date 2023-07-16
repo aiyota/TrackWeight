@@ -64,7 +64,7 @@ public class WeightService : IWeightService
         if (!(await WeightRecordExistsAsync(weightId)))
             throw new WeightRecordNotFoundException(weightId);
 
-        if (record.UserId != deletedById)
+        if (record!.UserId != deletedById)
             throw new UserNotAuthorizedException();
 
         return await _weightRepository.DeleteAsync(weightId);
